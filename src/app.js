@@ -15,13 +15,13 @@ app.get("/repositories", (request, response) => {
 });
 
 app.post("/repositories", (request, response) => {
-  const {title, url, techs, likes} = request.body;
+  const {title, url, techs} = request.body;
   const repository = {
     id: uuid(),
     title, 
     url, 
     techs,
-    likes: 1
+    likes: 0
   }
   repositories.push(repository);
   return response.status(200).json(repository);
@@ -33,7 +33,7 @@ app.put("/repositories/:id", (request, response) => {
 
   const repositoryIndex = repositories.findIndex(repository => repository.id === id);
   if(repositoryIndex<0){
-    return res.status(400).json({error: "should not be able to update a repository that does not exist"})
+    return response.status(400).send();
   }
   
   const repository = {
@@ -61,16 +61,16 @@ app.delete("/repositories/:id", (request, response) => {
 
 app.post("/repositories/:id/like", (request, response) => {
   const {id} = request.params;
-  const {like = 1} = request.query;
-  const repositoryIndex = repositories.findIndex(repository => repository.id === id);
+  
+  const repository = repositories.find(repository => repository.id === id);
 
-if(repositoryIndex<0){
-    return response.status(400).json({error: "should not be able to like a repository that does not exist"})
+  if(!repository){
+    return response.status(400).send();
   }
   
-  repositories[repositoryIndex].likes =   repositories[repositoryIndex].likes +like;
+  repository.likes +=1;  
   
-  return response.json(repositories);
+  return response.json(repository);
  
 
 
